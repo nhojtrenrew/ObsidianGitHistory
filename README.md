@@ -4,12 +4,14 @@ An Obsidian plugin for managing the promotion of design standards from a working
 
 ## Documentation
 
-- **[QUICK_START.md](QUICK_START.md)** - 5-minute setup guide (start here!)
-- **[USER_GUIDE.md](USER_GUIDE.md)** - Complete setup and usage instructions
-- **[INSTALLATION.md](INSTALLATION.md)** - Installation and troubleshooting guide
-- **[GIT_AUTO_SETUP_FEATURE.md](GIT_AUTO_SETUP_FEATURE.md)** - Automatic Git detection and setup
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Technical architecture and design details
+### 📚 Main Documentation
+- **[USER_GUIDE_COMPLETE.md](USER_GUIDE_COMPLETE.md)** - Complete user guide (start here!)
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Technical architecture and implementation details
 - **[CHANGELOG.md](CHANGELOG.md)** - Version history and release notes
+
+### 🔧 Additional Resources
+- **[SETTINGS_SUMMARY.md](SETTINGS_SUMMARY.md)** - Quick settings reference
+- **[DOCUMENTATION_STRUCTURE.md](DOCUMENTATION_STRUCTURE.md)** - Documentation overview and maintenance guide
 
 ## Quick Start
 
@@ -20,7 +22,7 @@ An Obsidian plugin for managing the promotion of design standards from a working
 5. Edit files in working vault
 6. Run "Promote Changes" to sync to production
 
-**New to the plugin?** See [QUICK_START.md](QUICK_START.md) for a guided walkthrough.
+**New to the plugin?** See the Quick Start section in [USER_GUIDE_COMPLETE.md](USER_GUIDE_COMPLETE.md) for a guided walkthrough.
 
 ## Overview
 

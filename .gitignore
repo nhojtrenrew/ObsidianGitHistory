@@ -20,3 +20,6 @@ Thumbs.db
 
 # TypeScript cache
 *.tsbuildinfo
+
+# Archive folder (legacy documentation)
+ARCHIVE/
