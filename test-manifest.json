@@ -1,0 +1,10 @@
+{
+	"id": "obsidian-github-tracker",
+	"name": "GitHub Vault Tracker",
+	"version": "1.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "Test plugin",
+	"author": "Test",
+	"authorUrl": "https://github.com/test",
+	"isDesktopOnly": true
+}

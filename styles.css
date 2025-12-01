@@ -1,0 +1,9 @@
+/* GitHub Vault Tracker Plugin Styles */
+
+.github-tracker-modal {
+    padding: 20px;
+}
+
+.github-tracker-modal .setting-item {
+    border: none;
+}
