@@ -2443,7 +2443,7 @@ class GitHubTrackerSettingTab extends PluginSettingTab {
 							new Notice(`❌ GitHub validation failed: ${result.error}`, 8000);
 						}
 					} catch (error: any) {
-						new Notice(`❌ Connection error: ${error.message}`, 8000);
+						const notice = new Notice(`❌ Connection error: ${error.message}`, 8000);
 						console.error('GitHub token validation error:', error);
 					}
 				}));
@@ -2496,7 +2496,7 @@ class GitHubTrackerSettingTab extends PluginSettingTab {
 					const email = this.plugin.settings.gitUserEmail.trim();
 					
 					if (!name || !email) {
-						new Notice('⚠️ Git identity is empty. This is OK if you have Git configured globally.', 5000);
+						const notice = new Notice('⚠️ Git identity is empty. This is OK if you have Git configured globally.', 5000);
 						return;
 					}
 					
@@ -2508,7 +2508,7 @@ class GitHubTrackerSettingTab extends PluginSettingTab {
 						return;
 					}
 					
-					new Notice(`✅ Git identity is valid!\nName: ${name}\nEmail: ${email}`, 5000);
+					const notice = new Notice(`✅ Git identity is valid!\nName: ${name}\nEmail: ${email}`, 5000);
 				}));
 
 		// ========================================
@@ -2550,7 +2550,7 @@ class GitHubTrackerSettingTab extends PluginSettingTab {
 						new Notice(`✅ Found Git at: ${gitPath}`, 6000);
 						this.display(); // Refresh settings display
 					} else {
-						new Notice('❌ Could not find Git. Please install Git or specify path manually.', 8000);
+						const notice = new Notice('❌ Could not find Git. Please install Git or specify path manually.', 8000);
 					}
 				}));
 
