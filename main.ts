@@ -2296,14 +2296,23 @@ class GitHubTrackerSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		containerEl.createEl('h2', { text: 'GitHub Tracker Settings' });
+		containerEl.createEl('h1', { text: 'GitHub Tracker Settings' });
+
+		// ========================================
+		// SECTION 1: Obsidian Vault File Paths
+		// ========================================
+		containerEl.createEl('h2', { text: '📁 Obsidian Vault File Paths' });
+		containerEl.createEl('p', { 
+			text: 'Configure the paths to your working and production vaults. The working vault is where your team makes edits, and the production vault is the published version.',
+			cls: 'setting-item-description'
+		});
 
 		// Working Vault Path
 		new Setting(containerEl)
 			.setName('Working Vault Path')
-			.setDesc('Path to the working vault directory where the edit team modifies files')
+			.setDesc('Full path to your working vault (where edits are made)')
 			.addText(text => text
-				.setPlaceholder('/path/to/working/vault')
+				.setPlaceholder('C:\\Users\\YourName\\Documents\\WorkingVault')
 				.setValue(this.plugin.settings.workingVaultPath)
 				.onChange(async (value) => {
 					this.plugin.settings.workingVaultPath = value;
@@ -2313,9 +2322,9 @@ class GitHubTrackerSettingTab extends PluginSettingTab {
 		// Production Vault Path
 		new Setting(containerEl)
 			.setName('Production Vault Path')
-			.setDesc('Path to the production vault directory (must be a Git repository)')
+			.setDesc('Full path to your production vault (published version, must be a Git repository)')
 			.addText(text => text
-				.setPlaceholder('/path/to/production/vault')
+				.setPlaceholder('C:\\Users\\YourName\\Documents\\ProductionVault')
 				.setValue(this.plugin.settings.productionVaultPath)
 				.onChange(async (value) => {
 					this.plugin.settings.productionVaultPath = value;
@@ -2324,10 +2333,11 @@ class GitHubTrackerSettingTab extends PluginSettingTab {
 
 		// Validate Paths Button
 		new Setting(containerEl)
-			.setName('Validate Vault Paths')
-			.setDesc('Check that both vault paths exist and are accessible')
+			.setName('Validate Paths')
+			.setDesc('Verify that both vault paths exist and are accessible')
 			.addButton(button => button
-				.setButtonText('Validate')
+				.setButtonText('Validate Paths')
+				.setCta()
 				.onClick(async () => {
 					try {
 						const result = this.validatePaths();
@@ -2342,27 +2352,72 @@ class GitHubTrackerSettingTab extends PluginSettingTab {
 					}
 				}));
 
+		// ========================================
+		// SECTION 2: GitHub Settings
+		// ========================================
+		containerEl.createEl('h2', { text: '🔗 GitHub Settings' });
+		containerEl.createEl('p', { 
+			text: 'Configure GitHub integration for creating pull requests and tracking changes.',
+			cls: 'setting-item-description'
+		});
+
+		// Repository Configuration
+		containerEl.createEl('h3', { text: 'Repository Configuration' });
+
+		// GitHub Repository Owner
+		new Setting(containerEl)
+			.setName('Repository Owner')
+			.setDesc('GitHub username or organization that owns the repository')
+			.addText(text => text
+				.setPlaceholder('username or org-name')
+				.setValue(this.plugin.settings.githubRepoOwner)
+				.onChange(async (value) => {
+					this.plugin.settings.githubRepoOwner = value.trim();
+					await this.plugin.saveSettings();
+				}));
+
+		// GitHub Repository Name
+		new Setting(containerEl)
+			.setName('Repository Name')
+			.setDesc('Name of the GitHub repository (without the owner)')
+			.addText(text => text
+				.setPlaceholder('my-vault-repo')
+				.setValue(this.plugin.settings.githubRepoName)
+				.onChange(async (value) => {
+					this.plugin.settings.githubRepoName = value.trim();
+					await this.plugin.saveSettings();
+				}));
+
+		// Authentication
+		containerEl.createEl('h3', { text: 'Authentication' });
+		containerEl.createEl('p', { 
+			text: 'Create a Personal Access Token at: https://github.com/settings/tokens (requires "repo" permissions)',
+			cls: 'setting-item-description'
+		});
+
 		// GitHub Token
 		new Setting(containerEl)
-			.setName('GitHub Personal Access Token')
-			.setDesc('Token for authenticating with GitHub API (requires repo permissions)')
+			.setName('Personal Access Token')
+			.setDesc('GitHub token for API authentication (kept secure, never displayed)')
 			.addText(text => {
 				text.inputEl.type = 'password';
 				text
 					.setPlaceholder('ghp_xxxxxxxxxxxxxxxxxxxx')
 					.setValue(this.plugin.settings.githubToken)
 					.onChange(async (value) => {
-						this.plugin.settings.githubToken = value;
+						this.plugin.settings.githubToken = value.trim();
 						await this.plugin.saveSettings();
 					});
+				text.inputEl.style.width = '400px';
 			});
 
 		// Validate GitHub Token Button
 		new Setting(containerEl)
-			.setName('Validate GitHub Token')
-			.setDesc('Test your GitHub token to ensure it has the correct permissions')
+			.setName('Validate GitHub Connection')
+			.setDesc('Test your GitHub token and repository configuration')
 			.addButton(button => button
-				.setButtonText('Validate')
+				.setButtonText('Validate GitHub')
+				.setCta()
 				.onClick(async () => {
 					if (!this.plugin.settings.githubToken) {
 						new Notice('❌ Please enter a GitHub token first', 5000);
@@ -2374,7 +2429,7 @@ class GitHubTrackerSettingTab extends PluginSettingTab {
 					}
 
 					try {
-						new Notice('🔍 Validating GitHub token...');
+						new Notice('🔍 Validating GitHub connection...');
 						const githubService = new GitHubService(
 							this.plugin.settings.githubToken,
 							this.plugin.settings.githubRepoOwner,
@@ -2383,51 +2438,27 @@ class GitHubTrackerSettingTab extends PluginSettingTab {
 						const result = await githubService.validateToken();
 						
 						if (result.valid) {
-							new Notice('✅ GitHub token is valid and has correct permissions', 6000);
+							new Notice('✅ GitHub connection successful! Token has correct permissions.', 6000);
 						} else {
-							new Notice(`❌ Token validation failed: ${result.error}`, 8000);
+							new Notice(`❌ GitHub validation failed: ${result.error}`, 8000);
 						}
 					} catch (error: any) {
-						new Notice(`❌ Token validation error: ${error.message}`, 8000);
+						new Notice(`❌ Connection error: ${error.message}`, 8000);
 						console.error('GitHub token validation error:', error);
 					}
 				}));
 
-		// GitHub Repository Owner
-		new Setting(containerEl)
-			.setName('GitHub Repository Owner')
-			.setDesc('Username or organization that owns the repository')
-			.addText(text => text
-				.setPlaceholder('username')
-				.setValue(this.plugin.settings.githubRepoOwner)
-				.onChange(async (value) => {
-					this.plugin.settings.githubRepoOwner = value;
-					await this.plugin.saveSettings();
-				}));
-
-		// GitHub Repository Name
-		new Setting(containerEl)
-			.setName('GitHub Repository Name')
-			.setDesc('Name of the repository tracking the production vault')
-			.addText(text => text
-				.setPlaceholder('my-vault-repo')
-				.setValue(this.plugin.settings.githubRepoName)
-				.onChange(async (value) => {
-					this.plugin.settings.githubRepoName = value;
-					await this.plugin.saveSettings();
-				}));
-
-		// Git Identity Settings
-		containerEl.createEl('h3', { text: 'Git Identity' });
+		// Git Identity
+		containerEl.createEl('h3', { text: 'Git Identity (Optional)' });
 		containerEl.createEl('p', { 
-			text: 'Configure your Git identity for commits. These settings will be used if Git global config is not set.',
+			text: 'These settings are used as fallback if Git global config is not set. If you already have Git configured globally, you can leave these empty.',
 			cls: 'setting-item-description'
 		});
 
 		// Git User Name
 		new Setting(containerEl)
 			.setName('Git User Name')
-			.setDesc('Your name for Git commits (e.g., "John Doe") - Required for commits')
+			.setDesc('Your name for Git commits (e.g., "John Doe")')
 			.addText(text => {
 				text
 					.setPlaceholder('Your Name')
@@ -2435,11 +2466,6 @@ class GitHubTrackerSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.gitUserName = value.trim();
 						await this.plugin.saveSettings();
-						
-						// Show feedback
-						if (value.trim()) {
-							new Notice('✅ Git user name saved', 2000);
-						}
 					});
 				text.inputEl.style.width = '300px';
 			});
@@ -2447,7 +2473,7 @@ class GitHubTrackerSettingTab extends PluginSettingTab {
 		// Git User Email
 		new Setting(containerEl)
 			.setName('Git User Email')
-			.setDesc('Your email for Git commits (e.g., "john@example.com") - Required for commits')
+			.setDesc('Your email for Git commits (e.g., "john@example.com")')
 			.addText(text => {
 				text
 					.setPlaceholder('your@email.com')
@@ -2455,11 +2481,6 @@ class GitHubTrackerSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.gitUserEmail = value.trim();
 						await this.plugin.saveSettings();
-						
-						// Show feedback
-						if (value.trim()) {
-							new Notice('✅ Git user email saved', 2000);
-						}
 					});
 				text.inputEl.style.width = '300px';
 			});
@@ -2467,49 +2488,59 @@ class GitHubTrackerSettingTab extends PluginSettingTab {
 		// Validate Git Identity button
 		new Setting(containerEl)
 			.setName('Validate Git Identity')
-			.setDesc('Test that your Git identity is configured correctly')
+			.setDesc('Check that your Git identity is properly formatted')
 			.addButton(button => button
-				.setButtonText('Validate')
+				.setButtonText('Validate Identity')
 				.onClick(async () => {
 					const name = this.plugin.settings.gitUserName.trim();
 					const email = this.plugin.settings.gitUserEmail.trim();
 					
 					if (!name || !email) {
-						new Notice('❌ Please enter both Git user name and email', 5000);
+						new Notice('⚠️ Git identity is empty. This is OK if you have Git configured globally.', 5000);
 						return;
 					}
 					
-					// Basic email validation
-					const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-					if (!emailRegex.test(email)) {
+					// Basic email validation - ReDoS-safe pattern
+					const emailRegex = /^[^\s@]{1,64}@[^\s@]{1,253}\.[^\s@]{2,63}$/;
+					
+					if (email.length > 254 || !emailRegex.test(email)) {
 						new Notice('⚠️ Email format looks invalid. Please check it.', 5000);
 						return;
 					}
 					
-					new Notice(`✅ Git identity looks good!\nName: ${name}\nEmail: ${email}`, 5000);
+					new Notice(`✅ Git identity is valid!\nName: ${name}\nEmail: ${email}`, 5000);
 				}));
 
-		// Advanced Settings
-		containerEl.createEl('h3', { text: 'Advanced Settings' });
+		// ========================================
+		// SECTION 3: Advanced Settings
+		// ========================================
+		containerEl.createEl('h2', { text: '⚙️ Advanced Settings' });
+		containerEl.createEl('p', { 
+			text: 'Advanced configuration options for Git installation and system setup.',
+			cls: 'setting-item-description'
+		});
+
+		// Git Installation
+		containerEl.createEl('h3', { text: 'Git Installation' });
 
 		// Custom Git Path
 		new Setting(containerEl)
 			.setName('Custom Git Path')
-			.setDesc('Optional: Specify custom path to git.exe if not in system PATH')
+			.setDesc('Specify custom path to git.exe (leave empty to use system PATH)')
 			.addText(text => text
 				.setPlaceholder('C:\\Program Files\\Git\\cmd\\git.exe')
 				.setValue(this.plugin.settings.customGitPath)
 				.onChange(async (value) => {
-					this.plugin.settings.customGitPath = value;
+					this.plugin.settings.customGitPath = value.trim();
 					await this.plugin.saveSettings();
 				}));
 
 		// Auto-detect Git button
 		new Setting(containerEl)
 			.setName('Auto-detect Git')
-			.setDesc('Automatically find Git installation on your system')
+			.setDesc('Automatically locate Git installation on your system (Windows)')
 			.addButton(button => button
-				.setButtonText('Detect')
+				.setButtonText('Auto-detect')
 				.onClick(async () => {
 					new Notice('🔍 Searching for Git installation...');
 					const gitPath = await GitService.findGitOnWindows();
@@ -2519,35 +2550,37 @@ class GitHubTrackerSettingTab extends PluginSettingTab {
 						new Notice(`✅ Found Git at: ${gitPath}`, 6000);
 						this.display(); // Refresh settings display
 					} else {
-						new Notice('❌ Could not find Git installation. Please install Git or specify path manually.', 8000);
+						new Notice('❌ Could not find Git. Please install Git or specify path manually.', 8000);
 					}
 				}));
 
-		// System Requirements Check
-		containerEl.createEl('h3', { text: 'System Requirements' });
+		// System Diagnostics
+		containerEl.createEl('h3', { text: 'System Diagnostics' });
 		
 		new Setting(containerEl)
 			.setName('Check System Requirements')
-			.setDesc('Verify that all prerequisites are met before setting up Git')
+			.setDesc('Verify Git installation, configuration, and all prerequisites')
 			.addButton(button => button
-				.setButtonText('Check Requirements')
+				.setButtonText('Run Diagnostics')
 				.onClick(async () => {
 					await this.plugin.checkSystemRequirements();
 				}));
 
-		// Git Setup Button
-		containerEl.createEl('h3', { text: 'Git Repository Setup' });
+		// ========================================
+		// SECTION 4: Setup Wizard
+		// ========================================
+		containerEl.createEl('h2', { text: '🚀 Setup Wizard' });
 		containerEl.createEl('p', { 
-			text: 'Use this to automatically set up both vaults as Git repositories with the correct branches and remote configuration.',
+			text: 'First time setup? Use this wizard to automatically configure Git repositories for both vaults with the correct branches and remote connections.',
 			cls: 'setting-item-description'
 		});
 
 		new Setting(containerEl)
 			.setName('Initialize Git Repositories')
-			.setDesc('Set up production vault (main branch) and working vault (working branch) as Git repositories')
+			.setDesc('Automatically set up production vault (main branch) and working vault (working branch)')
 			.addButton(button => button
-				.setButtonText('Git Setup')
-				.setClass('mod-cta')
+				.setButtonText('Run Setup Wizard')
+				.setCta()
 				.onClick(async () => {
 					await this.performGitSetup();
 				}));
