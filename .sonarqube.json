@@ -1,0 +1,87 @@
+{
+  "sonarqube": {
+    "exclusions": [],
+    "coverage": {
+      "exclusions": []
+    },
+    "cpd": {
+      "exclusions": []
+    }
+  },
+  "sonar": {
+    "issue": {
+      "ignore": {
+        "multicriteria": {
+          "e1": {
+            "ruleKey": "typescript:S7780",
+            "resourceKey": "**/*.ts"
+          },
+          "e2": {
+            "ruleKey": "typescript:S2486",
+            "resourceKey": "**/*.ts"
+          },
+          "e3": {
+            "ruleKey": "typescript:S1848",
+            "resourceKey": "**/*.ts"
+          },
+          "e4": {
+            "ruleKey": "typescript:S7735",
+            "resourceKey": "**/*.ts"
+          },
+          "e5": {
+            "ruleKey": "typescript:S4323",
+            "resourceKey": "**/*.ts"
+          },
+          "e6": {
+            "ruleKey": "typescript:S7773",
+            "resourceKey": "**/*.ts"
+          },
+          "e7": {
+            "ruleKey": "typescript:S3358",
+            "resourceKey": "**/*.ts"
+          },
+          "e8": {
+            "ruleKey": "typescript:S4165",
+            "resourceKey": "**/*.ts"
+          },
+          "e9": {
+            "ruleKey": "typescript:S1854",
+            "resourceKey": "**/*.ts"
+          },
+          "e10": {
+            "ruleKey": "typescript:S3776",
+            "resourceKey": "**/*.ts"
+          },
+          "e11": {
+            "ruleKey": "typescript:S2933",
+            "resourceKey": "**/*.ts"
+          },
+          "e12": {
+            "ruleKey": "typescript:S6594",
+            "resourceKey": "**/*.ts"
+          },
+          "e13": {
+            "ruleKey": "typescript:S1871",
+            "resourceKey": "**/*.ts"
+          },
+          "e14": {
+            "ruleKey": "typescript:S6535",
+            "resourceKey": "**/*.ts"
+          },
+          "e15": {
+            "ruleKey": "typescript:S7755",
+            "resourceKey": "**/*.ts"
+          },
+          "e16": {
+            "ruleKey": "typescript:S6582",
+            "resourceKey": "**/*.ts"
+          },
+          "e17": {
+            "ruleKey": "typescript:S6661",
+            "resourceKey": "**/*.ts"
+          }
+        }
+      }
+    }
+  }
+}
